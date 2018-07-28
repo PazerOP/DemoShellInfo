@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xmlns="http://schemas.microsoft.com/windows/2006/propertydescription"
+		schemaVersion="1.0">
+	<propertyDescriptionList publisher="PazerFromSilver" product="VTF Shell Extensions">
+
+		<!-- Storage Format-->
+		<propertyDescription name="DemoShellInfo.PlaybackTime" formatID="{FC783E08-7B78-42FD-B7F7-931E753E9658}" propID="150">
+			<description>Length of the demo in hours/minutes/seconds.</description>
+			<typeInfo type="UInt64" isInnate="true" isViewable="true" />
+			<labelInfo label="Demo Length (Time)" />
+			<displayInfo displayType="Number" />
+			<numberFormat formatDurationAs="hh:mm:ss" />
+		</propertyDescription>
+		<propertyDescription name="DemoShellInfo.Ticks" formatID="{FC783E08-7B78-42FD-B7F7-931E753E9658}" propID="151">
+			<description>Length of the demo in ticks.</description>
+			<typeInfo type="Int32" isInnate="true" isViewable="true" />
+			<labelInfo label="Demo Length (Ticks)" />
+		</propertyDescription>
+		<propertyDescription name="DemoShellInfo.Frames" formatID="{FC783E08-7B78-42FD-B7F7-931E753E9658}" propID="152">
+			<description>Length of the demo in frames.</description>
+			<typeInfo type="Int32" isInnate="true" isViewable="true" />
+			<labelInfo label="Demo Length (Frames)" />
+		</propertyDescription>
+
+		<propertyDescription name="DemoShellInfo.ServerName" formatID="{FC783E08-7B78-42FD-B7F7-931E753E9658}" propID="153">
+			<description>Name of the server where this demo was recorded.</description>
+			<typeInfo type="String" isInnate="false" isViewable="true" />
+			<labelInfo label="Demo Server Name" />
+			<editControl control="Text" />
+		</propertyDescription>
+		<propertyDescription name="DemoShellInfo.ClientName" formatID="{FC783E08-7B78-42FD-B7F7-931E753E9658}" propID="154">
+			<description>Name of the player who recorded this demo.</description>
+			<typeInfo type="String" isInnate="false" isViewable="true" />
+			<labelInfo label="Demo Client Name" />
+			<editControl control="Text" />
+		</propertyDescription>
+		<propertyDescription name="DemoShellInfo.MapName" formatID="{FC783E08-7B78-42FD-B7F7-931E753E9658}" propID="155">
+			<description>Map where this demo was recorded.</description>
+			<typeInfo type="String" isInnate="true" isViewable="true" />
+			<labelInfo label="Demo Map Name" />
+			<editControl control="Text" />
+		</propertyDescription>
+		<propertyDescription name="DemoShellInfo.GameDirectory" formatID="{FC783E08-7B78-42FD-B7F7-931E753E9658}" propID="156">
+			<description>Directory name of the game that recorded this demo.</description>
+			<typeInfo type="String" isInnate="true" isViewable="true" />
+			<labelInfo label="Demo Game Directory" />
+			<editControl control="Text" />
+		</propertyDescription>
+
+	</propertyDescriptionList>
+</schema>

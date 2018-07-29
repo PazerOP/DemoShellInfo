@@ -5,11 +5,20 @@
 #include <atomic>
 #include <cassert>
 
-template<typename... Types>
-class UnknownObject : public Types...
+class UnknownObjectBase
 {
 public:
-	UnknownObject()
+	static uint32_t GetTotalRefCount() { return s_TotalRefCount; }
+
+protected:
+	static std::atomic<uint32_t> s_TotalRefCount;
+};
+
+template<typename... Types>
+class UnknownObject : UnknownObjectBase, public Types...
+{
+public:
+	UnknownObject() : m_RefCount(0)
 	{
 		AddRef();
 	}
@@ -29,9 +38,16 @@ public:
 		return E_NOINTERFACE;
 	}
 
-	ULONG STDMETHODCALLTYPE AddRef() override final { return ++m_RefCount; }
+	ULONG STDMETHODCALLTYPE AddRef() override final
+	{
+		++s_TotalRefCount;
+		return ++m_RefCount;
+	}
 	ULONG STDMETHODCALLTYPE Release() override final
 	{
+		assert(s_TotalRefCount > 0);
+		--s_TotalRefCount;
+
 		assert(m_RefCount > 0);
 
 		auto newVal = --m_RefCount;

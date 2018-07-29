@@ -7,6 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DemoShellInfo", "DemoShellI
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SHChangeNotifyCaller", "SHChangeNotifyCaller\SHChangeNotifyCaller.vcxproj", "{BD3B7A77-9F7F-4ADB-8CBA-9F4C4540B340}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "DemoShellInfoSetup", "DemoShellInfoSetup\DemoShellInfoSetup.vdproj", "{8FA06122-0BAB-4302-9800-FA06747461D3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -31,6 +33,11 @@ Global
 		{BD3B7A77-9F7F-4ADB-8CBA-9F4C4540B340}.Release|x64.Build.0 = Release|x64
 		{BD3B7A77-9F7F-4ADB-8CBA-9F4C4540B340}.Release|x86.ActiveCfg = Release|Win32
 		{BD3B7A77-9F7F-4ADB-8CBA-9F4C4540B340}.Release|x86.Build.0 = Release|Win32
+		{8FA06122-0BAB-4302-9800-FA06747461D3}.Debug|x64.ActiveCfg = Debug
+		{8FA06122-0BAB-4302-9800-FA06747461D3}.Debug|x86.ActiveCfg = Debug
+		{8FA06122-0BAB-4302-9800-FA06747461D3}.Release|x64.ActiveCfg = Release
+		{8FA06122-0BAB-4302-9800-FA06747461D3}.Release|x64.Build.0 = Release
+		{8FA06122-0BAB-4302-9800-FA06747461D3}.Release|x86.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

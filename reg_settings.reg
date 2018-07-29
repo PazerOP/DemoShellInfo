@@ -3,15 +3,12 @@ Windows Registry Editor Version 5.00
 [HKEY_CLASSES_ROOT\.dem]
 @="Pazer.DemoShellInfo.Demo"
 
-[HKEY_CLASSES_ROOT\.dem\ShellEx]
-
-[HKEY_CLASSES_ROOT\.dem\ShellEx\PropertyHandler]
-@="{C6FF826A-1EF5-4526-95DC-134BCC7B3BE3}"
-
 [HKEY_CLASSES_ROOT\Pazer.DemoShellInfo.Demo]
 @="Source Engine Demo"
-
-[HKEY_CLASSES_ROOT\CLSID\{C6FF826A-1EF5-4526-95DC-134BCC7B3BE3}]
+[HKEY_CLASSES_ROOT\Pazer.DemoShellInfo.Demo\DefaultIcon]
+@="C:\\Program Files (x86)\\Steam\\steamapps\\common\\Team Fortress 2\\tf\\resource\\game.ico"
+[HKEY_CLASSES_ROOT\Pazer.DemoShellInfo.Demo\ShellEx\PropertyHandler]
+@="{C6FF826A-1EF5-4526-95DC-134BCC7B3BE3}"
 
 [HKEY_CLASSES_ROOT\CLSID\{C6FF826A-1EF5-4526-95DC-134BCC7B3BE3}\InprocServer32]
 @="C:\\Users\\matt\\source\\repos\\DemoShellInfo\\output\\x64\\Debug\\DemoShellInfo\\DemoShellInfo.dll"
@@ -21,7 +18,4 @@ Windows Registry Editor Version 5.00
 "FullDetails"="prop:DemoShellInfo.PlaybackTime;DemoShellInfo.Ticks;DemoShellInfo.Frames;DemoShellInfo.ServerName;DemoShellInfo.ClientName;DemoShellInfo.MapName;DemoShellInfo.GameDirectory;System.PropGroup.FileSystem;System.ItemNameDisplay;System.ItemType;System.ItemFolderPathDisplay;System.Size;System.DateCreated;System.DateModified;System.FileAttributes;*System.OfflineAvailability;*System.OfflineStatus;*System.SharedWith;*System.FileOwner;*System.ComputerName"
 "InfoTip"="prop:System.ItemType;DemoShellInfo.GameDirectory;DemoShellInfo.ClientName;DemoShellInfo.PlaybackTime"
 
-; [HKEY_CLASSES_ROOT\Pazer.DemoShellInfo.Demo]
-; "FullDetails"="prop:System.Media.Duration;DemoShellInfo.Names;System.PropGroup.FileSystem;System.ItemNameDisplay;System.ItemType;System.ItemFolderPathDisplay;System.Size;System.DateCreated;System.DateModified;System.FileAttributes;*System.OfflineAvailability;*System.OfflineStatus;*System.SharedWith;*System.FileOwner;*System.ComputerName"
-
-; prop:VTFFile.Version;VTFFile.Format;VTFFile.ThumbFormat;System.Image.Dimensions;VTFFile.ThumbSize;VTFFile.KVDAuthor;VTFFile.KVDContact;VTFFile.KVDVersion;VTFFile.KVDMod;VTFFile.KVDDescription;VTFFile.KVDComments;System.DateModified;System.Size;System.DateCreated;*System.OfflineAvailability;*System.OfflineStatus;*System.SharedWith
+;prop:DemoShellInfo.PlaybackTime;DemoShellInfo.Ticks;DemoShellInfo.Frames;DemoShellInfo.ServerName;DemoShellInfo.ClientName;DemoShellInfo.MapName;DemoShellInfo.GameDirectory;System.ItemNameDisplay;System.ItemType;System.ItemFolderPathDisplay;System.Size;System.DateCreated;System.DateModified;System.FileAttributes;*System.OfflineAvailability;*System.OfflineStatus;*System.SharedWith;*System.FileOwner;*System.ComputerName

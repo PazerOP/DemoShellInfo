@@ -7,19 +7,52 @@
 class PropVariantSafe final
 {
 public:
-	PropVariantSafe()
+	PropVariantSafe() { PropVariantInit(&m_Variant); }
+	PropVariantSafe(const PropVariantSafe& other) { CopyUnsafe(other.m_Variant); }
+	PropVariantSafe(const PROPVARIANT& other) { CopyUnsafe(other); }
+	PropVariantSafe(PropVariantSafe&& other)
 	{
-		PropVariantInit(&m_Variant);
+		m_Variant = other.m_Variant;
+		PropVariantInit(&other.m_Variant);
 	}
-	~PropVariantSafe()
+	~PropVariantSafe() { Clear(); }
+
+	PropVariantSafe& operator=(const PropVariantSafe& other)
 	{
-		if (auto hr = PropVariantClear(&m_Variant))
-		{
-			std::cerr << "test";
-			OutputDebugStringA("")
-		}
+		Clear();
+		CopyUnsafe(other.m_Variant);
+		return *this;
+	}
+	PropVariantSafe& operator=(const PROPVARIANT& other)
+	{
+		Clear();
+		CopyUnsafe(other);
+		return *this;
 	}
 
+	void Set(const PROPVARIANT& other)
+	{
+		Clear();
+		CopyUnsafe(other);
+	}
+	void Clear()
+	{
+		if (auto hr = PropVariantClear(&m_Variant))
+			std::cerr << "Failed to PropVariantClear(): HRESULT = " << std::hex << hr << std::endl;
+	}
+
+	__forceinline PROPVARIANT& operator*() { return m_Variant; }
+	__forceinline PROPVARIANT* operator->() { return &m_Variant; }
+
+	__forceinline PROPVARIANT& Get() { return m_Variant; }
+	__forceinline const PROPVARIANT& Get() const { return m_Variant; }
+
 private:
+	void CopyUnsafe(const PROPVARIANT& other)
+	{
+		if (auto hr = PropVariantCopy(&m_Variant, &other))
+			std::cerr << "Failed to PropVariantCopy(): HRESULT = " << std::hex << hr << std::endl;
+	}
+
 	PROPVARIANT m_Variant;
 };

@@ -33,23 +33,7 @@ static constexpr PROPERTYKEY PKEY_Demo_GameDirectory = CreatePropertyKey(s_DemoS
 // IPropertySetStorage
 HRESULT STDMETHODCALLTYPE TestMetadataProvider::Create(REFFMTID rfmtid, const CLSID *pclsid, DWORD grfFlags, DWORD grfMode, IPropertyStorage **ppprstg)
 {
-	if (!ppprstg)
-		return E_POINTER;
-
-	LOCK_GUARD(m_Mutex);
-
-	if (rfmtid == PKEY_Media_Duration.fmtid ||
-		rfmtid == PKEY_Calendar_Location.fmtid ||
-		rfmtid == s_DemoShellInfoProps)
-	{
-		auto storage = new DemoPropertyStorage(rfmtid, this, grfFlags);
-		//storage->SetClass(pclsid ? *pclsid : CLSID_NULL);
-
-		*ppprstg = storage;
-		return S_OK;
-	}
-
-	return E_UNEXPECTED;
+	return E_NOTIMPL;
 }
 HRESULT STDMETHODCALLTYPE TestMetadataProvider::Delete(REFFMTID rfmtid)
 {
@@ -61,8 +45,6 @@ HRESULT STDMETHODCALLTYPE TestMetadataProvider::Enum(IEnumSTATPROPSETSTG **ppenu
 }
 HRESULT STDMETHODCALLTYPE TestMetadataProvider::Open(REFFMTID rfmtid, DWORD grfMode, IPropertyStorage **ppprstg)
 {
-	//return Create(rfmtid, &s_DemoShellInfoCLSID, PROPSETFLAG_DEFAULT, grfMode, ppprstg);
-
 	if (!ppprstg)
 		return E_POINTER;
 
@@ -72,18 +54,17 @@ HRESULT STDMETHODCALLTYPE TestMetadataProvider::Open(REFFMTID rfmtid, DWORD grfM
 		rfmtid == PKEY_Calendar_Location.fmtid ||
 		rfmtid == s_DemoShellInfoProps)
 	{
-		//auto& found = m_OpenedPropertyStorages[rfmtid];
-		//if (!found)
-		//	found.reset(new DemoPropertyStorage(rfmtid, this, PROPSETFLAG_NONSIMPLE));
+		auto& found = m_OpenedPropertyStorages[rfmtid];
+		if (!found)
+		{
+			found.reset(new DemoPropertyStorage(rfmtid, this, PROPSETFLAG_NONSIMPLE));
 
-		//found->AddRef();
-		//*ppprstg = found.get();
-		auto storage = new DemoPropertyStorage(rfmtid, this, PROPSETFLAG_NONSIMPLE);
+			if (rfmtid == s_DemoShellInfoProps)
+				found->SetClass(s_DemoShellInfoCLSID);
+		}
 
-		if (rfmtid == s_DemoShellInfoProps)
-			storage->SetClass(s_DemoShellInfoCLSID);
-			 //storage->SetClass(pclsid ? *pclsid : CLSID_NULL);
-		*ppprstg = storage;
+		found->AddRef();
+		*ppprstg = found.get();
 
 		return S_OK;
 	}

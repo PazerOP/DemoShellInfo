@@ -32,7 +32,7 @@ ClassFactory::~ClassFactory()
 	assert(m_ServerLockCount == 0);
 }
 
-HRESULT STDMETHODCALLTYPE ClassFactory::CreateInstance(IUnknown* pUnkOuter, REFIID riid, void **ppvObject)
+HRESULT STDMETHODCALLTYPE ClassFactory::CreateInstance(IUnknown* /*pUnkOuter*/, REFIID riid, void **ppvObject)
 {
 	if (!ppvObject)
 		return E_POINTER;

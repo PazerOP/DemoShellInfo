@@ -148,6 +148,7 @@ HRESULT STDMETHODCALLTYPE DemoPropertyStorage::SetClass(REFCLSID clsid)
 	return S_OK;
 }
 
+#pragma warning(disable : 4996)
 HRESULT STDMETHODCALLTYPE DemoPropertyStorage::Stat(STATPROPSETSTG* pstatpsstg)
 {
 	if (!pstatpsstg)
@@ -157,10 +158,12 @@ HRESULT STDMETHODCALLTYPE DemoPropertyStorage::Stat(STATPROPSETSTG* pstatpsstg)
 
 	pstatpsstg->fmtid = m_FmtID;
 	pstatpsstg->clsid = m_CLSID;
-	pstatpsstg->grfFlags = m_Flags;
-	pstatpsstg->ctime = m_CreatedTime;
-	pstatpsstg->mtime = m_ModifiedTime;
-	pstatpsstg->atime = m_AccessedTime;
+	//pstatpsstg->grfFlags = m_Flags;
+	pstatpsstg->grfFlags = STGM_READWRITE | STGM_SHARE_EXCLUSIVE;
+	//pstatpsstg->ctime = m_CreatedTime;
+	//pstatpsstg->mtime = m_ModifiedTime;
+	//pstatpsstg->atime = m_AccessedTime;
+	pstatpsstg->ctime = pstatpsstg->mtime = pstatpsstg->atime = FILETIME{};
 
 	return S_OK;
 }

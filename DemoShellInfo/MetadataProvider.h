@@ -4,20 +4,15 @@
 
 #include <propkeydef.h>
 #include <propsys.h>
+#include <ShObjIdl.h>
 
 #include <map>
 #include <mutex>
 #include <string>
 
-class TestMetadataProvider final : public UnknownObject<IPropertySetStorage, IInitializeWithStream, IPropertyStore>
+class TestMetadataProvider final : public UnknownObject<IPropertyStoreCapabilities, IInitializeWithStream, IPropertyStore>
 {
 public:
-	// IPropertySetStorage
-	HRESULT STDMETHODCALLTYPE Create(REFFMTID rfmtid, const CLSID *pclsid, DWORD grfFlags, DWORD grfMode, IPropertyStorage **ppprstg) override;
-	HRESULT STDMETHODCALLTYPE Delete(REFFMTID rfmtid) override;
-	HRESULT STDMETHODCALLTYPE Enum(IEnumSTATPROPSETSTG **ppenum) override;
-	HRESULT STDMETHODCALLTYPE Open(REFFMTID rfmtid, DWORD grfMode, IPropertyStorage **ppprstg) override;
-
 	// IInitializeWithStream
 	HRESULT STDMETHODCALLTYPE Initialize(IStream* pStream, DWORD grfMode) override;
 
@@ -28,17 +23,23 @@ public:
 	HRESULT STDMETHODCALLTYPE SetValue(REFPROPERTYKEY key, REFPROPVARIANT propvar) override;
 	HRESULT STDMETHODCALLTYPE Commit() override;
 
+	// IPropertyStoreCapabilities
+	IFACEMETHODIMP IsPropertyWritable(REFPROPERTYKEY key) override;
+
+	IFACEMETHODIMP QueryInterface(REFIID riid, void** ppv) override;
+
 protected:
-	IUnknown* TryGetInterface(REFIID riid) override;
+	InterfacePair TryGetInterface(REFIID riid) override;
 
 private:
-	IStream* m_Stream = nullptr;
+	std::unique_ptr<IStream, UnknownDeleter> m_Stream;
+	//std::unique_ptr<IDestinationStreamFactory, UnknownDeleter> m_DestFactory;
+	//std::unique_ptr<IPropertyStoreCache, UnknownDeleter> m_Cache;
+	//IStream* m_Stream;
 
 	static constexpr auto SECONDS_TO_TICKS = 10000000;
 
 	DemoHeader m_Header;
-
-	std::map<IID, std::unique_ptr<DemoPropertyStorage, UnknownDeleter>> m_OpenedPropertyStorages;
 
 	std::mutex m_Mutex;
 	std::map<PROPERTYKEY, PropVariantSafe> m_Properties;

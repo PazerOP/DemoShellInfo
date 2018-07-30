@@ -23,15 +23,15 @@ public:
 		AddRef();
 	}
 
-	HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void** ppvObject) override final
+	HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void** ppvObject) override
 	{
 		if (!ppvObject)
 			return E_POINTER;
 
-		if (auto found = TryGetInterface(riid))
+		if (auto found = TryGetInterface(riid); found.first)
 		{
-			found->AddRef();
-			*ppvObject = found;
+			found.second->AddRef();
+			*ppvObject = found.first;
 			return S_OK;
 		}
 
@@ -58,7 +58,13 @@ public:
 	}
 
 protected:
-	virtual IUnknown* TryGetInterface(REFIID riid) = 0;
+	using InterfacePair = std::pair<void*, IUnknown*>;
+	virtual InterfacePair TryGetInterface(REFIID riid) = 0;
+	template<typename T, typename T2> static InterfacePair GetInterface(T2* fullType)
+	{
+		return std::pair<void*, IUnknown*>(static_cast<T*>(fullType), static_cast<IUnknown*>(static_cast<T*>(fullType)));
+	}
+	static constexpr InterfacePair NO_INTERFACE = std::make_pair<void*, IUnknown*>(nullptr, nullptr);
 
 private:
 	std::atomic<ULONG> m_RefCount;

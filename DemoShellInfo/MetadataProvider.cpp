@@ -7,6 +7,8 @@
 #include <strsafe.h>
 #include <Windows.h>
 
+#pragma warning(disable : 4189)
+
 // {FC783E08-7B78-42FD-B7F7-931E753E9658}
 static constexpr GUID s_DemoShellInfoProps = { 0xfc783e08, 0x7b78, 0x42fd, { 0xb7, 0xf7, 0x93, 0x1e, 0x75, 0x3e, 0x96, 0x58 } };
 enum class DemoProps
@@ -30,6 +32,7 @@ static constexpr PROPERTYKEY PKEY_Demo_ClientName = CreatePropertyKey(s_DemoShel
 static constexpr PROPERTYKEY PKEY_Demo_MapName = CreatePropertyKey(s_DemoShellInfoProps, (int)DemoProps::MapName);
 static constexpr PROPERTYKEY PKEY_Demo_GameDirectory = CreatePropertyKey(s_DemoShellInfoProps, (int)DemoProps::GameDirectory);
 
+#if false
 // IPropertySetStorage
 HRESULT STDMETHODCALLTYPE TestMetadataProvider::Create(REFFMTID rfmtid, const CLSID *pclsid, DWORD grfFlags, DWORD grfMode, IPropertyStorage **ppprstg)
 {
@@ -71,17 +74,39 @@ HRESULT STDMETHODCALLTYPE TestMetadataProvider::Open(REFFMTID rfmtid, DWORD grfM
 
 	return E_UNEXPECTED;
 }
+#endif
 
 // IInitializeWithStream
 HRESULT STDMETHODCALLTYPE TestMetadataProvider::Initialize(IStream* pStream, DWORD grfMode)
 {
 	LOCK_GUARD(m_Mutex);
 
-	m_Stream = pStream;
+	if (m_Stream)
+		return E_UNEXPECTED;
+
+	// Grab a reference to the stream
+	if (grfMode & STGM_READWRITE)
+	{
+		IStream* stream;
+		if (auto hr = pStream->QueryInterface(&stream))
+			return hr;
+
+		m_Stream.reset(stream);
+	}
 
 	STATSTG stats;
-	if (auto hr = pStream->Stat(&stats, STATFLAG_NONAME); hr != S_OK)
+	if (auto hr = pStream->Stat(&stats, STATFLAG_DEFAULT); hr != S_OK)
 		return hr;
+
+	// Initialize cache
+	if (false)
+	{
+		IPropertyStoreCache* cache;
+		if (auto hr = PSCreateMemoryPropertyStore(IID_PPV_ARGS(&cache)))
+			return hr;
+
+		//m_Cache.reset(cache);
+	}
 
 	if (auto hr = pStream->Seek(CreateLargeInteger(0), STREAM_SEEK_SET, nullptr); hr != S_OK)
 		return hr;
@@ -161,6 +186,20 @@ HRESULT STDMETHODCALLTYPE TestMetadataProvider::SetValue(REFPROPERTYKEY key, REF
 }
 HRESULT STDMETHODCALLTYPE TestMetadataProvider::Commit()
 {
+	LOCK_GUARD(m_Mutex);
+
+	if (!m_Stream)
+		return E_NOTIMPL;
+
+	/*std::unique_ptr<IStream, UnknownDeleter> stream;
+	{
+		IStream* rawStream;
+		if (auto hr = m_DestFactory->GetDestinationStream(&rawStream))
+			return hr;
+
+		stream.reset(rawStream);
+	}*/
+
 	// Currently, the only thing we're allowing users to change is the client name
 	wchar_t wBuf[DemoHeader::STRING_LENGTHS];
 	if (auto hr = PropVariantToString(m_Properties.at(PKEY_Demo_ClientName).Get(), wBuf, UINT(std::size(wBuf))))
@@ -177,20 +216,41 @@ HRESULT STDMETHODCALLTYPE TestMetadataProvider::Commit()
 	if (auto hr = m_Stream->Write(&m_Header, sizeof(m_Header), nullptr))
 		return hr;
 
-	m_Stream = nullptr;
+	if (auto hr = m_Stream->Commit(STGC_DEFAULT))
+		return hr;
+
 	return S_OK;
 }
 
-IUnknown* TestMetadataProvider::TryGetInterface(REFIID riid)
+IFACEMETHODIMP TestMetadataProvider::IsPropertyWritable(REFPROPERTYKEY key)
 {
-	if (riid == __uuidof(IPropertySetStorage))
-		return static_cast<IPropertySetStorage*>(this);
-	if (riid == __uuidof(IInitializeWithStream))
-		return static_cast<IInitializeWithStream*>(this);
-	//if (riid == __uuidof(IPropertyStore))
-	//	return static_cast<IPropertyStore*>(this);
+	if (key == PKEY_Demo_ClientName)
+		return S_OK;
 
-	return nullptr;
+	return S_FALSE;
+}
+
+IFACEMETHODIMP TestMetadataProvider::QueryInterface(REFIID riid, void** ppv)
+{
+	static const QITAB qit[] = {
+		QITABENT(TestMetadataProvider, IPropertyStore),
+		QITABENT(TestMetadataProvider, IPropertyStoreCapabilities),
+		QITABENT(TestMetadataProvider, IInitializeWithStream),
+		{ 0 },
+	};
+	return QISearch(this, qit, riid, ppv);
+}
+
+TestMetadataProvider::InterfacePair TestMetadataProvider::TryGetInterface(REFIID riid)
+{
+	//if (riid == __uuidof(IPropertySetStorage))
+	//	return static_cast<IPropertySetStorage*>(this);
+	if (riid == __uuidof(IInitializeWithStream))
+		return GetInterface<IInitializeWithStream>(this);
+	if (riid == __uuidof(IPropertyStore))
+		return GetInterface<IPropertyStore>(this);
+
+	return NO_INTERFACE;
 }
 
 PROPERTYKEY TestMetadataProvider::HandleKeyAliases(const PROPERTYKEY& key)

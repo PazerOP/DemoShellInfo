@@ -10,12 +10,19 @@ Windows Registry Editor Version 5.00
 [HKEY_CLASSES_ROOT\Pazer.DemoShellInfo.Demo\ShellEx\PropertyHandler]
 @="{C6FF826A-1EF5-4526-95DC-134BCC7B3BE3}"
 
+[HKEY_CLASSES_ROOT\CLSID\{C6FF826A-1EF5-4526-95DC-134BCC7B3BE3}]
+@=".dem (Source Engine Demo) Property Handler"
+"ManualSafeSave"=dword:00000001
+
 [HKEY_CLASSES_ROOT\CLSID\{C6FF826A-1EF5-4526-95DC-134BCC7B3BE3}\InprocServer32]
 @="C:\\Users\\matt\\source\\repos\\DemoShellInfo\\output\\x64\\Debug\\DemoShellInfo\\DemoShellInfo.dll"
-"ThreadingModel"="Apartment"
+"ThreadingModel"="Both"
 
 [HKEY_CLASSES_ROOT\SystemFileAssociations\.dem]
 "FullDetails"="prop:DemoShellInfo.PlaybackTime;DemoShellInfo.Ticks;DemoShellInfo.Frames;DemoShellInfo.ServerName;DemoShellInfo.ClientName;DemoShellInfo.MapName;DemoShellInfo.GameDirectory;System.PropGroup.FileSystem;System.ItemNameDisplay;System.ItemType;System.ItemFolderPathDisplay;System.Size;System.DateCreated;System.DateModified;System.FileAttributes;*System.OfflineAvailability;*System.OfflineStatus;*System.SharedWith;*System.FileOwner;*System.ComputerName"
 "InfoTip"="prop:System.ItemType;DemoShellInfo.GameDirectory;DemoShellInfo.ClientName;DemoShellInfo.PlaybackTime"
+
+[HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\PropertySystem\PropertyHandlers\.dem]
+@="{C6FF826A-1EF5-4526-95DC-134BCC7B3BE3}"
 
 ;prop:DemoShellInfo.PlaybackTime;DemoShellInfo.Ticks;DemoShellInfo.Frames;DemoShellInfo.ServerName;DemoShellInfo.ClientName;DemoShellInfo.MapName;DemoShellInfo.GameDirectory;System.ItemNameDisplay;System.ItemType;System.ItemFolderPathDisplay;System.Size;System.DateCreated;System.DateModified;System.FileAttributes;*System.OfflineAvailability;*System.OfflineStatus;*System.SharedWith;*System.FileOwner;*System.ComputerName

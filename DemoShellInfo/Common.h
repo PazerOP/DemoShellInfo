@@ -34,6 +34,6 @@ inline bool GetFileTime(FILETIME& time)
 
 #define MAKE_UNIQUE_NAME(base) PP_CAT(base, __COUNTER__)
 
-//#define LOCK_GUARD(mutex) std::lock_guard<decltype(mutex)> MAKE_UNIQUE_NAME(__lock_guard)(mutex)
+#define LOCK_GUARD(mutex) std::lock_guard<decltype(mutex)> MAKE_UNIQUE_NAME(__lock_guard)(mutex)
 
-#define LOCK_GUARD(mutex)
+//#define LOCK_GUARD(mutex)

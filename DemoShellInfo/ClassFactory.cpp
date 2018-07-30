@@ -16,19 +16,16 @@ public:
 	bool IsLocked() { return m_ServerLockCount > 0; }
 
 protected:
-	IUnknown * TryGetInterface(REFIID riid) override;
+	InterfacePair TryGetInterface(REFIID riid) override;
 
 	std::atomic<int> m_ServerLockCount;
 };
 
 ClassFactory::ClassFactory() : m_ServerLockCount(0)
 {
-	LOCK_GUARD(s_ClassFactoryLifetimeMutex);
 }
 ClassFactory::~ClassFactory()
 {
-	LOCK_GUARD(s_ClassFactoryLifetimeMutex);
-
 	assert(m_ServerLockCount == 0);
 }
 
@@ -37,9 +34,9 @@ HRESULT STDMETHODCALLTYPE ClassFactory::CreateInstance(IUnknown* /*pUnkOuter*/, 
 	if (!ppvObject)
 		return E_POINTER;
 
-	if (riid == __uuidof(IPropertySetStorage))
+	if (riid == __uuidof(IPropertyStore))
 	{
-		*ppvObject = new TestMetadataProvider();
+		*ppvObject = static_cast<IPropertyStore*>(new TestMetadataProvider());
 		return S_OK;
 	}
 
@@ -56,12 +53,12 @@ HRESULT STDMETHODCALLTYPE ClassFactory::LockServer(BOOL fLock)
 	return S_OK;
 }
 
-IUnknown* ClassFactory::TryGetInterface(REFIID riid)
+ClassFactory::InterfacePair ClassFactory::TryGetInterface(REFIID riid)
 {
 	if (riid == __uuidof(IClassFactory))
-		return this;
+		return GetInterface<IClassFactory>(this);
 
-	return nullptr;
+	return NO_INTERFACE;
 }
 
 IClassFactory* CreateClassFactory()

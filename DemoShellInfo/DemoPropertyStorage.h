@@ -34,7 +34,7 @@ public:
 	HRESULT STDMETHODCALLTYPE Stat(STATPROPSETSTG* pstatpsstg) override;
 
 protected:
-	IUnknown* TryGetInterface(REFIID riid) override;
+	InterfacePair TryGetInterface(REFIID riid) override;
 
 	PROPERTYKEY GetPropertyKey(PROPID id) const { return CreatePropertyKey(m_FmtID, id); }
 

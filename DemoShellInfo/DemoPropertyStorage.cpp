@@ -168,10 +168,10 @@ HRESULT STDMETHODCALLTYPE DemoPropertyStorage::Stat(STATPROPSETSTG* pstatpsstg)
 	return S_OK;
 }
 
-IUnknown* DemoPropertyStorage::TryGetInterface(REFIID riid)
+DemoPropertyStorage::InterfacePair DemoPropertyStorage::TryGetInterface(REFIID riid)
 {
 	if (riid == __uuidof(IPropertyStorage))
-		return static_cast<IPropertyStorage*>(this);
+		return GetInterface<IPropertyStorage>(this);
 
-	return nullptr;
+	return NO_INTERFACE;
 }

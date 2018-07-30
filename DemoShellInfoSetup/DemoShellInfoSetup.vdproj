@@ -161,7 +161,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:DemoShellInfo"
         "ProductCode" = "8:{FF7467D7-E0B1-4C45-BD70-1470C3672045}"
-        "PackageCode" = "8:{AC547D79-6F1A-41B5-A259-1A38FFAE9E1F}"
+        "PackageCode" = "8:{4DD185E4-A1E9-4B06-B171-11AB2EA2F47B}"
         "UpgradeCode" = "8:{741FB776-60C2-4657-9DB7-0F47D65D6B03}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -193,6 +193,112 @@
             {
                 "Keys"
                 {
+                    "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_B9A94F161DA64D548812969AF73C1784"
+                    {
+                    "Name" = "8:Software"
+                    "Condition" = "8:"
+                    "AlwaysCreate" = "11:FALSE"
+                    "DeleteAtUninstall" = "11:FALSE"
+                    "Transitive" = "11:FALSE"
+                        "Keys"
+                        {
+                            "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_A73FF3B7EC6D45CBB0F8B6CC8B9D382E"
+                            {
+                            "Name" = "8:Microsoft"
+                            "Condition" = "8:"
+                            "AlwaysCreate" = "11:FALSE"
+                            "DeleteAtUninstall" = "11:FALSE"
+                            "Transitive" = "11:FALSE"
+                                "Keys"
+                                {
+                                    "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_69ABE0C5553648F3B06B6D5BA4645B95"
+                                    {
+                                    "Name" = "8:Windows"
+                                    "Condition" = "8:"
+                                    "AlwaysCreate" = "11:FALSE"
+                                    "DeleteAtUninstall" = "11:FALSE"
+                                    "Transitive" = "11:FALSE"
+                                        "Keys"
+                                        {
+                                            "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_8A10904017C84A048A71BB11CC6F7844"
+                                            {
+                                            "Name" = "8:CurrentVersion"
+                                            "Condition" = "8:"
+                                            "AlwaysCreate" = "11:FALSE"
+                                            "DeleteAtUninstall" = "11:FALSE"
+                                            "Transitive" = "11:FALSE"
+                                                "Keys"
+                                                {
+                                                    "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_39DD30378F27447B9202E42AF2462B59"
+                                                    {
+                                                    "Name" = "8:PropertySystem"
+                                                    "Condition" = "8:"
+                                                    "AlwaysCreate" = "11:FALSE"
+                                                    "DeleteAtUninstall" = "11:FALSE"
+                                                    "Transitive" = "11:FALSE"
+                                                        "Keys"
+                                                        {
+                                                            "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_E763620FB7B840A8A5A5CA4B5CECF114"
+                                                            {
+                                                            "Name" = "8:PropertyHandlers"
+                                                            "Condition" = "8:"
+                                                            "AlwaysCreate" = "11:FALSE"
+                                                            "DeleteAtUninstall" = "11:FALSE"
+                                                            "Transitive" = "11:FALSE"
+                                                                "Keys"
+                                                                {
+                                                                    "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_DFF5924F74974114973F7A99AED9C722"
+                                                                    {
+                                                                    "Name" = "8:.dem"
+                                                                    "Condition" = "8:"
+                                                                    "AlwaysCreate" = "11:FALSE"
+                                                                    "DeleteAtUninstall" = "11:FALSE"
+                                                                    "Transitive" = "11:FALSE"
+                                                                        "Keys"
+                                                                        {
+                                                                        }
+                                                                        "Values"
+                                                                        {
+                                                                            "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_D218623F981E438AB4CDC3BE5BB4E5B3"
+                                                                            {
+                                                                            "Name" = "8:"
+                                                                            "Condition" = "8:"
+                                                                            "Transitive" = "11:FALSE"
+                                                                            "ValueTypes" = "3:1"
+                                                                            "Value" = "8:{C6FF826A-1EF5-4526-95DC-134BCC7B3BE3}"
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                                "Values"
+                                                                {
+                                                                }
+                                                            }
+                                                        }
+                                                        "Values"
+                                                        {
+                                                        }
+                                                    }
+                                                }
+                                                "Values"
+                                                {
+                                                }
+                                            }
+                                        }
+                                        "Values"
+                                        {
+                                        }
+                                    }
+                                }
+                                "Values"
+                                {
+                                }
+                            }
+                        }
+                        "Values"
+                        {
+                        }
+                    }
                 }
             }
             "HKCU"
@@ -249,13 +355,29 @@
                                             "Condition" = "8:"
                                             "Transitive" = "11:FALSE"
                                             "ValueTypes" = "3:1"
-                                            "Value" = "8:Apartment"
+                                            "Value" = "8:Both"
                                             }
                                         }
                                     }
                                 }
                                 "Values"
                                 {
+                                    "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_29A38D55B96E47A0AD8365F10C5F78DF"
+                                    {
+                                    "Name" = "8:"
+                                    "Condition" = "8:"
+                                    "Transitive" = "11:FALSE"
+                                    "ValueTypes" = "3:1"
+                                    "Value" = "8:.dem (Source Engine Demo) Property Handler"
+                                    }
+                                    "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_8A723E6AF7844EBFBECD2DDA4A334CD6"
+                                    {
+                                    "Name" = "8:ManualSafeSave"
+                                    "Condition" = "8:"
+                                    "Transitive" = "11:FALSE"
+                                    "ValueTypes" = "3:3"
+                                    "Value" = "3:1"
+                                    }
                                 }
                             }
                         }
@@ -822,9 +944,9 @@
         }
         "ProjectOutput"
         {
-            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_22327BDAEBD54E2FA8704A7B81AF1C2B"
+            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_8A219813BE5A401B81FFCDC1A2F4CBCF"
             {
-            "SourcePath" = "8:..\\output\\x64\\Release\\DemoShellInfo\\DemoShellInfo.dll"
+            "SourcePath" = "8:..\\output\\x64\\Release\\DemoShellInfo\\DemoShellInfo_x64.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_196EC25CB6ED44EE81FFCC42B4D4F6DB"

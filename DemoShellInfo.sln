@@ -5,8 +5,6 @@ VisualStudioVersion = 15.0.27703.2042
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DemoShellInfo", "DemoShellInfo\DemoShellInfo.vcxproj", "{F44C7E5E-08C2-426C-8137-729657151731}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SHChangeNotifyCaller", "SHChangeNotifyCaller\SHChangeNotifyCaller.vcxproj", "{BD3B7A77-9F7F-4ADB-8CBA-9F4C4540B340}"
-EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "DemoShellInfoSetup", "DemoShellInfoSetup\DemoShellInfoSetup.vdproj", "{8FA06122-0BAB-4302-9800-FA06747461D3}"
 EndProject
 Global
@@ -25,14 +23,6 @@ Global
 		{F44C7E5E-08C2-426C-8137-729657151731}.Release|x64.Build.0 = Release|x64
 		{F44C7E5E-08C2-426C-8137-729657151731}.Release|x86.ActiveCfg = Release|Win32
 		{F44C7E5E-08C2-426C-8137-729657151731}.Release|x86.Build.0 = Release|Win32
-		{BD3B7A77-9F7F-4ADB-8CBA-9F4C4540B340}.Debug|x64.ActiveCfg = Debug|x64
-		{BD3B7A77-9F7F-4ADB-8CBA-9F4C4540B340}.Debug|x64.Build.0 = Debug|x64
-		{BD3B7A77-9F7F-4ADB-8CBA-9F4C4540B340}.Debug|x86.ActiveCfg = Debug|Win32
-		{BD3B7A77-9F7F-4ADB-8CBA-9F4C4540B340}.Debug|x86.Build.0 = Debug|Win32
-		{BD3B7A77-9F7F-4ADB-8CBA-9F4C4540B340}.Release|x64.ActiveCfg = Release|x64
-		{BD3B7A77-9F7F-4ADB-8CBA-9F4C4540B340}.Release|x64.Build.0 = Release|x64
-		{BD3B7A77-9F7F-4ADB-8CBA-9F4C4540B340}.Release|x86.ActiveCfg = Release|Win32
-		{BD3B7A77-9F7F-4ADB-8CBA-9F4C4540B340}.Release|x86.Build.0 = Release|Win32
 		{8FA06122-0BAB-4302-9800-FA06747461D3}.Debug|x64.ActiveCfg = Debug
 		{8FA06122-0BAB-4302-9800-FA06747461D3}.Debug|x86.ActiveCfg = Debug
 		{8FA06122-0BAB-4302-9800-FA06747461D3}.Release|x64.ActiveCfg = Release

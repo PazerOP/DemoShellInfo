@@ -91,8 +91,6 @@ template<typename T, typename InitFunc> HRESULT TestMetadataProvider::StoreIntoC
 // IInitializeWithStream
 HRESULT STDMETHODCALLTYPE TestMetadataProvider::Initialize(IStream* pStream, DWORD grfMode)
 {
-	OutputDebugStringA(__FUNCSIG__ "\n");
-
 	LOCK_GUARD(m_Mutex);
 
 	if (m_Initialized)
@@ -108,20 +106,11 @@ HRESULT STDMETHODCALLTYPE TestMetadataProvider::Initialize(IStream* pStream, DWO
 		return STG_E_ACCESSDENIED;
 
 	// Grab a reference to the stream
-	//if (!(grfMode & STGM_READWRITE))
+	if (grfMode & STGM_READWRITE)
 	{
-		if (grfMode & STGM_READWRITE)
-		{
-			m_Stream.reset(pStream);
-			const auto refCount = m_Stream->AddRef();
-			assert(refCount > 1);
-		}
-		//IStream* stream;
-		//if (auto hr = pStream->QueryInterface(&stream))
-		//	return hr;
-
-		//auto str = stream->Release();
-		//m_Stream.reset(stream);
+		m_Stream.reset(pStream);
+		const auto refCount = m_Stream->AddRef();
+		assert(refCount > 1);
 	}
 
 	m_Mode = grfMode;
@@ -135,7 +124,7 @@ HRESULT STDMETHODCALLTYPE TestMetadataProvider::Initialize(IStream* pStream, DWO
 		m_Cache.reset(cache);
 	}
 
-#if true
+	// Read the header
 	if (auto hr = pStream->Seek(CreateLargeInteger(0), STREAM_SEEK_SET, nullptr); hr != S_OK)
 		return hr;
 
@@ -146,21 +135,7 @@ HRESULT STDMETHODCALLTYPE TestMetadataProvider::Initialize(IStream* pStream, DWO
 	if (memcmp(m_Header.m_Header, m_Header.EXPECTED_HEADER, sizeof(m_Header.EXPECTED_HEADER)))
 		return E_INVALID_PROTOCOL_FORMAT;  // Invalid/corrupted .dem file
 
-#if false
-	InitPropVariantFromUInt64(ULONGLONG(double(m_Header.m_PlaybackTime) * SECONDS_TO_TICKS), &m_Properties[PKEY_Demo_LengthTime].Get());
-	InitPropVariantFromInt32(m_Header.m_Ticks, &m_Properties[PKEY_Demo_LengthTicks].Get());
-	InitPropVariantFromInt32(m_Header.m_Frames, &m_Properties[PKEY_Demo_LengthFrames].Get());
-
-	wchar_t buf[DemoHeader::STRING_LENGTHS];
-	mbstowcs_s(nullptr, buf, m_Header.m_ClientName, std::size(buf) - 1);
-	InitPropVariantFromString(buf, &m_Properties[PKEY_Demo_ClientName].Get());
-	mbstowcs_s(nullptr, buf, m_Header.m_ServerName, std::size(buf) - 1);
-	InitPropVariantFromString(buf, &m_Properties[PKEY_Demo_ServerName].Get());
-	mbstowcs_s(nullptr, buf, m_Header.m_MapName, std::size(buf) - 1);
-	InitPropVariantFromString(buf, &m_Properties[PKEY_Demo_MapName].Get());
-	mbstowcs_s(nullptr, buf, m_Header.m_GameDirectory, std::size(buf) - 1);
-	InitPropVariantFromString(buf, &m_Properties[PKEY_Demo_GameDirectory].Get());
-#else
+	// Load the header into the cache
 	if (auto hr = StoreIntoCache(ULONGLONG(double(m_Header.m_PlaybackTime) * SECONDS_TO_TICKS), InitPropVariantFromUInt64, PKEY_Demo_LengthTime))
 		return hr;
 	if (auto hr = StoreIntoCache(m_Header.m_Ticks, InitPropVariantFromInt32, PKEY_Demo_LengthTicks))
@@ -185,9 +160,6 @@ HRESULT STDMETHODCALLTYPE TestMetadataProvider::Initialize(IStream* pStream, DWO
 	if (auto hr = StoreIntoCache(buf, InitPropVariantFromString, PKEY_Demo_GameDirectory))
 		return hr;
 
-#endif
-#endif
-
 	return S_OK;
 }
 
@@ -210,8 +182,6 @@ HRESULT STDMETHODCALLTYPE TestMetadataProvider::SetValue(REFPROPERTYKEY key, REF
 }
 HRESULT STDMETHODCALLTYPE TestMetadataProvider::Commit()
 {
-	OutputDebugStringA(__FUNCSIG__ "\n");
-
 	LOCK_GUARD(m_Mutex);
 
 	if (!m_Stream)

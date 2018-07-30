@@ -36,7 +36,7 @@ HRESULT STDMETHODCALLTYPE ClassFactory::CreateInstance(IUnknown* /*pUnkOuter*/, 
 
 	if (riid == __uuidof(IPropertyStore))
 	{
-		*ppvObject = static_cast<IPropertyStore*>(new TestMetadataProvider());
+		*ppvObject = static_cast<IPropertyStore*>(new MetadataProvider());
 		return S_OK;
 	}
 

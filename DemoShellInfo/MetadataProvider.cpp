@@ -1,4 +1,3 @@
-#include "DemoPropertyStorage.h"
 #include "MetadataProvider.h"
 
 #include <objbase.h>
@@ -32,51 +31,7 @@ static constexpr PROPERTYKEY PKEY_Demo_ClientName = CreatePropertyKey(s_DemoShel
 static constexpr PROPERTYKEY PKEY_Demo_MapName = CreatePropertyKey(s_DemoShellInfoProps, (int)DemoProps::MapName);
 static constexpr PROPERTYKEY PKEY_Demo_GameDirectory = CreatePropertyKey(s_DemoShellInfoProps, (int)DemoProps::GameDirectory);
 
-#if false
-// IPropertySetStorage
-HRESULT STDMETHODCALLTYPE TestMetadataProvider::Create(REFFMTID rfmtid, const CLSID *pclsid, DWORD grfFlags, DWORD grfMode, IPropertyStorage **ppprstg)
-{
-	return E_NOTIMPL;
-}
-HRESULT STDMETHODCALLTYPE TestMetadataProvider::Delete(REFFMTID rfmtid)
-{
-	return E_NOTIMPL;
-}
-HRESULT STDMETHODCALLTYPE TestMetadataProvider::Enum(IEnumSTATPROPSETSTG **ppenum)
-{
-	return E_NOTIMPL;
-}
-HRESULT STDMETHODCALLTYPE TestMetadataProvider::Open(REFFMTID rfmtid, DWORD grfMode, IPropertyStorage **ppprstg)
-{
-	if (!ppprstg)
-		return E_POINTER;
-
-	LOCK_GUARD(m_Mutex);
-
-	if (rfmtid == PKEY_Media_Duration.fmtid ||
-		rfmtid == PKEY_Calendar_Location.fmtid ||
-		rfmtid == s_DemoShellInfoProps)
-	{
-		auto& found = m_OpenedPropertyStorages[rfmtid];
-		if (!found)
-		{
-			found.reset(new DemoPropertyStorage(rfmtid, this, PROPSETFLAG_NONSIMPLE));
-
-			if (rfmtid == s_DemoShellInfoProps)
-				found->SetClass(s_DemoShellInfoCLSID);
-		}
-
-		found->AddRef();
-		*ppprstg = found.get();
-
-		return S_OK;
-	}
-
-	return E_UNEXPECTED;
-}
-#endif
-
-template<typename T, typename InitFunc> HRESULT TestMetadataProvider::StoreIntoCache(const T& value, InitFunc func, const PROPERTYKEY& key)
+template<typename T, typename InitFunc> HRESULT MetadataProvider::StoreIntoCache(const T& value, InitFunc func, const PROPERTYKEY& key)
 {
 	PropVariantSafe variant;
 
@@ -89,7 +44,7 @@ template<typename T, typename InitFunc> HRESULT TestMetadataProvider::StoreIntoC
 }
 
 // IInitializeWithStream
-HRESULT STDMETHODCALLTYPE TestMetadataProvider::Initialize(IStream* pStream, DWORD grfMode)
+HRESULT STDMETHODCALLTYPE MetadataProvider::Initialize(IStream* pStream, DWORD grfMode)
 {
 	LOCK_GUARD(m_Mutex);
 
@@ -164,23 +119,23 @@ HRESULT STDMETHODCALLTYPE TestMetadataProvider::Initialize(IStream* pStream, DWO
 }
 
 // IPropertyStore
-HRESULT STDMETHODCALLTYPE TestMetadataProvider::GetCount(DWORD* cProps)
+HRESULT STDMETHODCALLTYPE MetadataProvider::GetCount(DWORD* cProps)
 {
 	return m_Cache->GetCount(cProps);
 }
-HRESULT STDMETHODCALLTYPE TestMetadataProvider::GetAt(DWORD iProp, PROPERTYKEY* pKey)
+HRESULT STDMETHODCALLTYPE MetadataProvider::GetAt(DWORD iProp, PROPERTYKEY* pKey)
 {
 	return m_Cache->GetAt(iProp, pKey);
 }
-HRESULT STDMETHODCALLTYPE TestMetadataProvider::GetValue(REFPROPERTYKEY key, PROPVARIANT* pv)
+HRESULT STDMETHODCALLTYPE MetadataProvider::GetValue(REFPROPERTYKEY key, PROPVARIANT* pv)
 {
 	return m_Cache->GetValue(HandleKeyAliases(key), pv);
 }
-HRESULT STDMETHODCALLTYPE TestMetadataProvider::SetValue(REFPROPERTYKEY key, REFPROPVARIANT propvar)
+HRESULT STDMETHODCALLTYPE MetadataProvider::SetValue(REFPROPERTYKEY key, REFPROPVARIANT propvar)
 {
 	return m_Cache->SetValueAndState(key, &propvar, PSC_DIRTY);
 }
-HRESULT STDMETHODCALLTYPE TestMetadataProvider::Commit()
+HRESULT STDMETHODCALLTYPE MetadataProvider::Commit()
 {
 	LOCK_GUARD(m_Mutex);
 
@@ -227,7 +182,7 @@ HRESULT STDMETHODCALLTYPE TestMetadataProvider::Commit()
 	return truncated ? INPLACE_S_TRUNCATED : S_OK;
 }
 
-IFACEMETHODIMP TestMetadataProvider::IsPropertyWritable(REFPROPERTYKEY key)
+IFACEMETHODIMP MetadataProvider::IsPropertyWritable(REFPROPERTYKEY key)
 {
 	OutputDebugStringA(__FUNCSIG__ "\n");
 
@@ -237,7 +192,7 @@ IFACEMETHODIMP TestMetadataProvider::IsPropertyWritable(REFPROPERTYKEY key)
 	return S_FALSE;
 }
 
-TestMetadataProvider::InterfacePair TestMetadataProvider::TryGetInterface(REFIID riid)
+MetadataProvider::InterfacePair MetadataProvider::TryGetInterface(REFIID riid)
 {
 	if (riid == __uuidof(IUnknown))
 		return GetInterface<IUnknown>(static_cast<IPropertyStore*>(this));
@@ -251,7 +206,7 @@ TestMetadataProvider::InterfacePair TestMetadataProvider::TryGetInterface(REFIID
 	return NO_INTERFACE;
 }
 
-PROPERTYKEY TestMetadataProvider::HandleKeyAliases(const PROPERTYKEY& key)
+PROPERTYKEY MetadataProvider::HandleKeyAliases(const PROPERTYKEY& key)
 {
 	if (key == PKEY_Media_Duration)
 		return PKEY_Demo_LengthTime;

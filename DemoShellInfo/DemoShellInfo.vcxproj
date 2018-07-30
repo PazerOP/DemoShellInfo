@@ -156,7 +156,6 @@
     <ClInclude Include="ClassFactory.h" />
     <ClInclude Include="Common.h" />
     <ClInclude Include="DemoHeader.h" />
-    <ClInclude Include="DemoPropertyStorage.h" />
     <ClInclude Include="Helpers\LargeIntegerCreator.h" />
     <ClInclude Include="Helpers\LessExtensions.h" />
     <ClInclude Include="Helpers\PropVariantSafe.h" />
@@ -167,7 +166,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ClassFactory.cpp" />
-    <ClCompile Include="DemoPropertyStorage.cpp" />
     <ClCompile Include="DemoShellInfo.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="Helpers\UnknownObject.cpp" />

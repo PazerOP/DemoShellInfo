@@ -1,6 +1,5 @@
 #pragma once
 #include "DemoHeader.h"
-#include "DemoPropertyStorage.h"
 
 #include <propkeydef.h>
 #include <propsys.h>
@@ -10,7 +9,7 @@
 #include <mutex>
 #include <string>
 
-class TestMetadataProvider final : public UnknownObject<IPropertyStoreCapabilities, IInitializeWithStream, IPropertyStore>
+class MetadataProvider final : public UnknownObject<IPropertyStoreCapabilities, IInitializeWithStream, IPropertyStore>
 {
 public:
 	// IInitializeWithStream

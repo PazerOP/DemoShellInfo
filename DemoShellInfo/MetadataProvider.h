@@ -30,15 +30,20 @@ protected:
 	InterfacePair TryGetInterface(REFIID riid) override;
 
 private:
-	std::unique_ptr<IStream, UnknownDeleter> m_Stream;
+	//UnknownPtr<IStream> m_Stream;
+	UnknownPtr<IPropertyStoreCache> m_Cache;
+	bool m_Initialized = false;
+	IStream* m_Stream = nullptr;
 	//std::unique_ptr<IDestinationStreamFactory, UnknownDeleter> m_DestFactory;
 	//IStream* m_Stream;
+
+	DWORD m_Mode = 0;
 
 	static constexpr auto SECONDS_TO_TICKS = 10000000;
 
 	DemoHeader m_Header;
 
-	std::mutex m_Mutex;
+	std::recursive_mutex m_Mutex;
 	std::map<PROPERTYKEY, PropVariantSafe> m_Properties;
 	static PROPERTYKEY HandleKeyAliases(const PROPERTYKEY& key);
 };

@@ -79,25 +79,50 @@ HRESULT STDMETHODCALLTYPE TestMetadataProvider::Open(REFFMTID rfmtid, DWORD grfM
 // IInitializeWithStream
 HRESULT STDMETHODCALLTYPE TestMetadataProvider::Initialize(IStream* pStream, DWORD grfMode)
 {
+	OutputDebugStringA(__FUNCSIG__ "\n");
+
 	LOCK_GUARD(m_Mutex);
 
-	if (m_Stream)
-		return E_UNEXPECTED;
-
-	// Grab a reference to the stream
-	if (grfMode & STGM_READWRITE)
-	{
-		IStream* stream;
-		if (auto hr = pStream->QueryInterface(&stream))
-			return hr;
-
-		m_Stream.reset(stream);
-	}
+	if (m_Initialized)
+		return HRESULT_FROM_WIN32(ERROR_ALREADY_INITIALIZED);
+	else
+		m_Initialized = true;
 
 	STATSTG stats;
 	if (auto hr = pStream->Stat(&stats, STATFLAG_DEFAULT); hr != S_OK)
 		return hr;
 
+	if ((grfMode & STGM_READWRITE) != (stats.grfMode & STGM_READWRITE))
+		return STG_E_ACCESSDENIED;
+
+	// Grab a reference to the stream
+	//if (!(grfMode & STGM_READWRITE))
+	{
+		if (grfMode & STGM_READWRITE)
+		{
+			m_Stream = pStream;
+			m_Stream->AddRef();
+		}
+		//IStream* stream;
+		//if (auto hr = pStream->QueryInterface(&stream))
+		//	return hr;
+
+		//auto str = stream->Release();
+		//m_Stream.reset(stream);
+	}
+
+	m_Mode = grfMode;
+
+	// Initialize cache
+	{
+		IPropertyStoreCache* cache;
+		if (auto hr = PSCreateMemoryPropertyStore(IID_PPV_ARGS(&cache)))
+			return hr;
+
+		m_Cache.reset(cache);
+	}
+
+#if true
 	if (auto hr = pStream->Seek(CreateLargeInteger(0), STREAM_SEEK_SET, nullptr); hr != S_OK)
 		return hr;
 
@@ -121,6 +146,7 @@ HRESULT STDMETHODCALLTYPE TestMetadataProvider::Initialize(IStream* pStream, DWO
 	InitPropVariantFromString(buf, &m_Properties[PKEY_Demo_MapName].Get());
 	mbstowcs_s(nullptr, buf, m_Header.m_GameDirectory, std::size(buf) - 1);
 	InitPropVariantFromString(buf, &m_Properties[PKEY_Demo_GameDirectory].Get());
+#endif
 
 	return S_OK;
 }
@@ -128,6 +154,8 @@ HRESULT STDMETHODCALLTYPE TestMetadataProvider::Initialize(IStream* pStream, DWO
 // IPropertyStore
 HRESULT STDMETHODCALLTYPE TestMetadataProvider::GetCount(DWORD* cProps)
 {
+	OutputDebugStringA(__FUNCSIG__ "\n");
+
 	if (!cProps)
 		return E_POINTER;
 
@@ -139,6 +167,8 @@ HRESULT STDMETHODCALLTYPE TestMetadataProvider::GetCount(DWORD* cProps)
 }
 HRESULT STDMETHODCALLTYPE TestMetadataProvider::GetAt(DWORD iProp, PROPERTYKEY* pKey)
 {
+	OutputDebugStringA(__FUNCSIG__ "\n");
+
 	if (!pKey)
 		return E_POINTER;
 
@@ -154,6 +184,8 @@ HRESULT STDMETHODCALLTYPE TestMetadataProvider::GetAt(DWORD iProp, PROPERTYKEY* 
 }
 HRESULT STDMETHODCALLTYPE TestMetadataProvider::GetValue(REFPROPERTYKEY key, PROPVARIANT* pv)
 {
+	OutputDebugStringA(__FUNCSIG__ "\n");
+
 	if (!pv)
 		return E_POINTER;
 
@@ -169,17 +201,27 @@ HRESULT STDMETHODCALLTYPE TestMetadataProvider::GetValue(REFPROPERTYKEY key, PRO
 }
 HRESULT STDMETHODCALLTYPE TestMetadataProvider::SetValue(REFPROPERTYKEY key, REFPROPVARIANT propvar)
 {
+	OutputDebugStringA(__FUNCSIG__ "\n");
+
 	LOCK_GUARD(m_Mutex);
+
+	if (!m_Stream)
+		return STG_E_ACCESSDENIED;
 
 	m_Properties[key].Set(propvar);
 	return S_OK;
 }
 HRESULT STDMETHODCALLTYPE TestMetadataProvider::Commit()
 {
+	OutputDebugStringA(__FUNCSIG__ "\n");
+
 	LOCK_GUARD(m_Mutex);
 
 	if (!m_Stream)
 		return E_NOTIMPL;
+
+	auto refCount = m_Stream->AddRef();
+	m_Stream->Release();
 
 	/*std::unique_ptr<IStream, UnknownDeleter> stream;
 	{
@@ -191,10 +233,13 @@ HRESULT STDMETHODCALLTYPE TestMetadataProvider::Commit()
 	}*/
 
 	// Currently, the only thing we're allowing users to change is the client name
+	bool truncated = false;
 	wchar_t wBuf[DemoHeader::STRING_LENGTHS];
 	if (auto hr = PropVariantToString(m_Properties.at(PKEY_Demo_ClientName).Get(), wBuf, UINT(std::size(wBuf))))
 	{
-		if (hr != STRSAFE_E_INSUFFICIENT_BUFFER) // We're willing to accept truncation
+		if (hr == STRSAFE_E_INSUFFICIENT_BUFFER) // We're willing to accept truncation
+			truncated = true;
+		else
 			return hr;
 	}
 
@@ -209,32 +254,25 @@ HRESULT STDMETHODCALLTYPE TestMetadataProvider::Commit()
 	if (auto hr = m_Stream->Commit(STGC_DEFAULT))
 		return hr;
 
-	return S_OK;
+	//m_Stream = nullptr;
+
+	return truncated ? INPLACE_S_TRUNCATED : S_OK;
 }
 
 IFACEMETHODIMP TestMetadataProvider::IsPropertyWritable(REFPROPERTYKEY key)
 {
+	OutputDebugStringA(__FUNCSIG__ "\n");
+
 	if (key == PKEY_Demo_ClientName)
 		return S_OK;
 
 	return S_FALSE;
 }
 
-#if false
-IFACEMETHODIMP TestMetadataProvider::QueryInterface(REFIID riid, void** ppv)
-{
-	static const QITAB qit[] = {
-		QITABENT(TestMetadataProvider, IPropertyStore),
-		QITABENT(TestMetadataProvider, IPropertyStoreCapabilities),
-		QITABENT(TestMetadataProvider, IInitializeWithStream),
-		{ 0 },
-	};
-	return QISearch(this, qit, riid, ppv);
-}
-#endif
-
 TestMetadataProvider::InterfacePair TestMetadataProvider::TryGetInterface(REFIID riid)
 {
+	if (riid == __uuidof(IUnknown))
+		return GetInterface<IUnknown>(static_cast<IPropertyStore*>(this));
 	if (riid == __uuidof(IPropertyStore))
 		return GetInterface<IPropertyStore>(this);
 	if (riid == __uuidof(IPropertyStoreCapabilities))

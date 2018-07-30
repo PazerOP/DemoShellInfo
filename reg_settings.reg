@@ -7,14 +7,14 @@ Windows Registry Editor Version 5.00
 @="Source Engine Demo"
 [HKEY_CLASSES_ROOT\Pazer.DemoShellInfo.Demo\DefaultIcon]
 @="C:\\Program Files (x86)\\Steam\\steamapps\\common\\Team Fortress 2\\tf\\resource\\game.ico"
-[HKEY_CLASSES_ROOT\Pazer.DemoShellInfo.Demo\ShellEx\PropertyHandler]
-@="{C6FF826A-1EF5-4526-95DC-134BCC7B3BE3}"
+;[HKEY_CLASSES_ROOT\Pazer.DemoShellInfo.Demo\ShellEx\PropertyHandler]
+;@="{C6FF826A-1EF5-4526-95DC-134BCC7B3BE3}"
 
 [HKEY_CLASSES_ROOT\CLSID\{C6FF826A-1EF5-4526-95DC-134BCC7B3BE3}]
 @=".dem (Source Engine Demo) Property Handler"
 "ManualSafeSave"=dword:00000001
-"EnableShareDenyWrite"=dword:00000001
-"EnableShareDenyNone"=dword:00000001
+;"EnableShareDenyWrite"=dword:00000001
+;"EnableShareDenyNone"=dword:00000001
 
 [HKEY_CLASSES_ROOT\CLSID\{C6FF826A-1EF5-4526-95DC-134BCC7B3BE3}\InprocServer32]
 @="C:\\Users\\matt\\source\\repos\\DemoShellInfo\\output\\x64\\Debug\\DemoShellInfo\\DemoShellInfo.dll"
@@ -23,6 +23,8 @@ Windows Registry Editor Version 5.00
 [HKEY_CLASSES_ROOT\SystemFileAssociations\.dem]
 "FullDetails"="prop:DemoShellInfo.PlaybackTime;DemoShellInfo.Ticks;DemoShellInfo.Frames;DemoShellInfo.ServerName;DemoShellInfo.ClientName;DemoShellInfo.MapName;DemoShellInfo.GameDirectory;System.PropGroup.FileSystem;System.ItemNameDisplay;System.ItemType;System.ItemFolderPathDisplay;System.Size;System.DateCreated;System.DateModified;System.FileAttributes;*System.OfflineAvailability;*System.OfflineStatus;*System.SharedWith;*System.FileOwner;*System.ComputerName"
 "InfoTip"="prop:System.ItemType;DemoShellInfo.GameDirectory;DemoShellInfo.ClientName;DemoShellInfo.PlaybackTime"
+"PreviewDetails"="prop:DemoShellInfo.PlaybackTime;DemoShellInfo.Ticks;DemoShellInfo.Frames;DemoShellInfo.ServerName;DemoShellInfo.ClientName;DemoShellInfo.MapName;DemoShellInfo.GameDirectory;System.ItemNameDisplay;System.ItemType;System.ItemFolderPathDisplay;System.Size;System.DateCreated;System.DateModified;System.FileAttributes;*System.OfflineAvailability;*System.OfflineStatus;*System.SharedWith;*System.FileOwner;*System.ComputerName"
+
 
 [HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\PropertySystem\PropertyHandlers\.dem]
 @="{C6FF826A-1EF5-4526-95DC-134BCC7B3BE3}"

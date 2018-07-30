@@ -11,6 +11,9 @@
     <Link>
       <AdditionalDependencies>Propsys.lib;Shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>copy "$(ProjectDir)DemoShellInfo.propdesc" "$(TargetDir)DemoShellInfo.propdesc"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup />
 </Project>

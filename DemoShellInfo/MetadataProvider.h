@@ -30,10 +30,10 @@ protected:
 	InterfacePair TryGetInterface(REFIID riid) override;
 
 private:
-	//UnknownPtr<IStream> m_Stream;
+	UnknownPtr<IStream> m_Stream;
 	UnknownPtr<IPropertyStoreCache> m_Cache;
 	bool m_Initialized = false;
-	IStream* m_Stream = nullptr;
+	//IStream* m_Stream = nullptr;
 	//std::unique_ptr<IDestinationStreamFactory, UnknownDeleter> m_DestFactory;
 	//IStream* m_Stream;
 
@@ -43,7 +43,9 @@ private:
 
 	DemoHeader m_Header;
 
+	template<typename T, typename InitFunc> HRESULT StoreIntoCache(const T& value, InitFunc func, const PROPERTYKEY& key);
+
 	std::recursive_mutex m_Mutex;
-	std::map<PROPERTYKEY, PropVariantSafe> m_Properties;
+	//std::map<PROPERTYKEY, PropVariantSafe> m_Properties;
 	static PROPERTYKEY HandleKeyAliases(const PROPERTYKEY& key);
 };

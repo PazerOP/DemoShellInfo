@@ -76,6 +76,18 @@ HRESULT STDMETHODCALLTYPE TestMetadataProvider::Open(REFFMTID rfmtid, DWORD grfM
 }
 #endif
 
+template<typename T, typename InitFunc> HRESULT TestMetadataProvider::StoreIntoCache(const T& value, InitFunc func, const PROPERTYKEY& key)
+{
+	PropVariantSafe variant;
+
+	if (auto hr = func(value, &variant.Get()))
+		return hr;
+	if (auto hr = m_Cache->SetValueAndState(key, &variant.Get(), PSC_NORMAL))
+		return hr;
+
+	return S_OK;
+}
+
 // IInitializeWithStream
 HRESULT STDMETHODCALLTYPE TestMetadataProvider::Initialize(IStream* pStream, DWORD grfMode)
 {
@@ -100,8 +112,9 @@ HRESULT STDMETHODCALLTYPE TestMetadataProvider::Initialize(IStream* pStream, DWO
 	{
 		if (grfMode & STGM_READWRITE)
 		{
-			m_Stream = pStream;
-			m_Stream->AddRef();
+			m_Stream.reset(pStream);
+			const auto refCount = m_Stream->AddRef();
+			assert(refCount > 1);
 		}
 		//IStream* stream;
 		//if (auto hr = pStream->QueryInterface(&stream))
@@ -133,6 +146,7 @@ HRESULT STDMETHODCALLTYPE TestMetadataProvider::Initialize(IStream* pStream, DWO
 	if (memcmp(m_Header.m_Header, m_Header.EXPECTED_HEADER, sizeof(m_Header.EXPECTED_HEADER)))
 		return E_INVALID_PROTOCOL_FORMAT;  // Invalid/corrupted .dem file
 
+#if false
 	InitPropVariantFromUInt64(ULONGLONG(double(m_Header.m_PlaybackTime) * SECONDS_TO_TICKS), &m_Properties[PKEY_Demo_LengthTime].Get());
 	InitPropVariantFromInt32(m_Header.m_Ticks, &m_Properties[PKEY_Demo_LengthTicks].Get());
 	InitPropVariantFromInt32(m_Header.m_Frames, &m_Properties[PKEY_Demo_LengthFrames].Get());
@@ -146,6 +160,32 @@ HRESULT STDMETHODCALLTYPE TestMetadataProvider::Initialize(IStream* pStream, DWO
 	InitPropVariantFromString(buf, &m_Properties[PKEY_Demo_MapName].Get());
 	mbstowcs_s(nullptr, buf, m_Header.m_GameDirectory, std::size(buf) - 1);
 	InitPropVariantFromString(buf, &m_Properties[PKEY_Demo_GameDirectory].Get());
+#else
+	if (auto hr = StoreIntoCache(ULONGLONG(double(m_Header.m_PlaybackTime) * SECONDS_TO_TICKS), InitPropVariantFromUInt64, PKEY_Demo_LengthTime))
+		return hr;
+	if (auto hr = StoreIntoCache(m_Header.m_Ticks, InitPropVariantFromInt32, PKEY_Demo_LengthTicks))
+		return hr;
+	if (auto hr = StoreIntoCache(m_Header.m_Frames, InitPropVariantFromInt32, PKEY_Demo_LengthFrames))
+		return hr;
+
+	wchar_t buf[DemoHeader::STRING_LENGTHS];
+	mbstowcs_s(nullptr, buf, m_Header.m_ClientName, std::size(buf) - 1);
+	if (auto hr = StoreIntoCache(buf, InitPropVariantFromString, PKEY_Demo_ClientName))
+		return hr;
+
+	mbstowcs_s(nullptr, buf, m_Header.m_ServerName, std::size(buf) - 1);
+	if (auto hr = StoreIntoCache(buf, InitPropVariantFromString, PKEY_Demo_ServerName))
+		return hr;
+
+	mbstowcs_s(nullptr, buf, m_Header.m_MapName, std::size(buf) - 1);
+	if (auto hr = StoreIntoCache(buf, InitPropVariantFromString, PKEY_Demo_MapName))
+		return hr;
+
+	mbstowcs_s(nullptr, buf, m_Header.m_GameDirectory, std::size(buf) - 1);
+	if (auto hr = StoreIntoCache(buf, InitPropVariantFromString, PKEY_Demo_GameDirectory))
+		return hr;
+
+#endif
 #endif
 
 	return S_OK;
@@ -154,62 +194,19 @@ HRESULT STDMETHODCALLTYPE TestMetadataProvider::Initialize(IStream* pStream, DWO
 // IPropertyStore
 HRESULT STDMETHODCALLTYPE TestMetadataProvider::GetCount(DWORD* cProps)
 {
-	OutputDebugStringA(__FUNCSIG__ "\n");
-
-	if (!cProps)
-		return E_POINTER;
-
-	LOCK_GUARD(m_Mutex);
-
-	*cProps = DWORD(m_Properties.size());
-
-	return S_OK;
+	return m_Cache->GetCount(cProps);
 }
 HRESULT STDMETHODCALLTYPE TestMetadataProvider::GetAt(DWORD iProp, PROPERTYKEY* pKey)
 {
-	OutputDebugStringA(__FUNCSIG__ "\n");
-
-	if (!pKey)
-		return E_POINTER;
-
-	LOCK_GUARD(m_Mutex);
-
-	if (iProp > m_Properties.size())
-		return E_INVALIDARG;
-
-	auto it = m_Properties.begin();
-	std::advance(it, iProp);
-	*pKey = it->first;
-	return S_OK;
+	return m_Cache->GetAt(iProp, pKey);
 }
 HRESULT STDMETHODCALLTYPE TestMetadataProvider::GetValue(REFPROPERTYKEY key, PROPVARIANT* pv)
 {
-	OutputDebugStringA(__FUNCSIG__ "\n");
-
-	if (!pv)
-		return E_POINTER;
-
-	LOCK_GUARD(m_Mutex);
-
-	if (auto found = m_Properties.find(HandleKeyAliases(key)); found != m_Properties.end())
-	{
-		*pv = found->second.Get();
-		return S_OK;
-	}
-	else
-		return E_NOT_SET;
+	return m_Cache->GetValue(HandleKeyAliases(key), pv);
 }
 HRESULT STDMETHODCALLTYPE TestMetadataProvider::SetValue(REFPROPERTYKEY key, REFPROPVARIANT propvar)
 {
-	OutputDebugStringA(__FUNCSIG__ "\n");
-
-	LOCK_GUARD(m_Mutex);
-
-	if (!m_Stream)
-		return STG_E_ACCESSDENIED;
-
-	m_Properties[key].Set(propvar);
-	return S_OK;
+	return m_Cache->SetValueAndState(key, &propvar, PSC_DIRTY);
 }
 HRESULT STDMETHODCALLTYPE TestMetadataProvider::Commit()
 {
@@ -223,19 +220,18 @@ HRESULT STDMETHODCALLTYPE TestMetadataProvider::Commit()
 	auto refCount = m_Stream->AddRef();
 	m_Stream->Release();
 
-	/*std::unique_ptr<IStream, UnknownDeleter> stream;
-	{
-		IStream* rawStream;
-		if (auto hr = m_DestFactory->GetDestinationStream(&rawStream))
-			return hr;
+	PropVariantSafe variant;
+	PSC_STATE state;
+	if (auto hr = m_Cache->GetValueAndState(PKEY_Demo_ClientName, &variant.Get(), &state))
+		return hr;
 
-		stream.reset(rawStream);
-	}*/
+	if (state != PSC_DIRTY)
+		return S_OK;  // Nothing to modify here
 
 	// Currently, the only thing we're allowing users to change is the client name
 	bool truncated = false;
 	wchar_t wBuf[DemoHeader::STRING_LENGTHS];
-	if (auto hr = PropVariantToString(m_Properties.at(PKEY_Demo_ClientName).Get(), wBuf, UINT(std::size(wBuf))))
+	if (auto hr = PropVariantToString(variant.Get(), wBuf, UINT(std::size(wBuf))))
 	{
 		if (hr == STRSAFE_E_INSUFFICIENT_BUFFER) // We're willing to accept truncation
 			truncated = true;
@@ -254,7 +250,9 @@ HRESULT STDMETHODCALLTYPE TestMetadataProvider::Commit()
 	if (auto hr = m_Stream->Commit(STGC_DEFAULT))
 		return hr;
 
+	//m_Stream->Release();
 	//m_Stream = nullptr;
+	m_Stream.reset();
 
 	return truncated ? INPLACE_S_TRUNCATED : S_OK;
 }

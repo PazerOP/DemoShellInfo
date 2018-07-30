@@ -26,15 +26,12 @@ public:
 	// IPropertyStoreCapabilities
 	IFACEMETHODIMP IsPropertyWritable(REFPROPERTYKEY key) override;
 
-	IFACEMETHODIMP QueryInterface(REFIID riid, void** ppv) override;
-
 protected:
 	InterfacePair TryGetInterface(REFIID riid) override;
 
 private:
 	std::unique_ptr<IStream, UnknownDeleter> m_Stream;
 	//std::unique_ptr<IDestinationStreamFactory, UnknownDeleter> m_DestFactory;
-	//std::unique_ptr<IPropertyStoreCache, UnknownDeleter> m_Cache;
 	//IStream* m_Stream;
 
 	static constexpr auto SECONDS_TO_TICKS = 10000000;

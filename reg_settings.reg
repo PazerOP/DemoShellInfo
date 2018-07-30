@@ -13,6 +13,8 @@ Windows Registry Editor Version 5.00
 [HKEY_CLASSES_ROOT\CLSID\{C6FF826A-1EF5-4526-95DC-134BCC7B3BE3}]
 @=".dem (Source Engine Demo) Property Handler"
 "ManualSafeSave"=dword:00000001
+"EnableShareDenyWrite"=dword:00000001
+"EnableShareDenyNone"=dword:00000001
 
 [HKEY_CLASSES_ROOT\CLSID\{C6FF826A-1EF5-4526-95DC-134BCC7B3BE3}\InprocServer32]
 @="C:\\Users\\matt\\source\\repos\\DemoShellInfo\\output\\x64\\Debug\\DemoShellInfo\\DemoShellInfo.dll"

@@ -98,16 +98,6 @@ HRESULT STDMETHODCALLTYPE TestMetadataProvider::Initialize(IStream* pStream, DWO
 	if (auto hr = pStream->Stat(&stats, STATFLAG_DEFAULT); hr != S_OK)
 		return hr;
 
-	// Initialize cache
-	if (false)
-	{
-		IPropertyStoreCache* cache;
-		if (auto hr = PSCreateMemoryPropertyStore(IID_PPV_ARGS(&cache)))
-			return hr;
-
-		//m_Cache.reset(cache);
-	}
-
 	if (auto hr = pStream->Seek(CreateLargeInteger(0), STREAM_SEEK_SET, nullptr); hr != S_OK)
 		return hr;
 
@@ -230,6 +220,7 @@ IFACEMETHODIMP TestMetadataProvider::IsPropertyWritable(REFPROPERTYKEY key)
 	return S_FALSE;
 }
 
+#if false
 IFACEMETHODIMP TestMetadataProvider::QueryInterface(REFIID riid, void** ppv)
 {
 	static const QITAB qit[] = {
@@ -240,15 +231,16 @@ IFACEMETHODIMP TestMetadataProvider::QueryInterface(REFIID riid, void** ppv)
 	};
 	return QISearch(this, qit, riid, ppv);
 }
+#endif
 
 TestMetadataProvider::InterfacePair TestMetadataProvider::TryGetInterface(REFIID riid)
 {
-	//if (riid == __uuidof(IPropertySetStorage))
-	//	return static_cast<IPropertySetStorage*>(this);
-	if (riid == __uuidof(IInitializeWithStream))
-		return GetInterface<IInitializeWithStream>(this);
 	if (riid == __uuidof(IPropertyStore))
 		return GetInterface<IPropertyStore>(this);
+	if (riid == __uuidof(IPropertyStoreCapabilities))
+		return GetInterface<IPropertyStoreCapabilities>(this);
+	if (riid == __uuidof(IInitializeWithStream))
+		return GetInterface<IInitializeWithStream>(this);
 
 	return NO_INTERFACE;
 }
